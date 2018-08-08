@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css">
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+    <style>
+        body {
+            text-align: center;
+        }
+    </style>
+    <title>TEMPLATE</title>
+</head>
+
+<body>
+    <h1>App 2</h1>
+    <div id='iabmessage'></div>
+    <input type='text' id='iab'></input>
+    <button id='interapp'>Send</button>
+    <script src='main.js'></script>
+    <script>
+        fin.desktop.InterApplicationBus.subscribe('demo-app', 'topic', (message) => {
+            let iabMess = document.getElementById('iabmessage');
+            iabMess.innerText = message;
+        })
+        let iabButton = document.getElementById('interapp')
+        let iabValue = document.getElementById('iab')
+        iabButton.onclick = () => {
+            fin.desktop.InterApplicationBus.send('demo-app', 'topic', iabValue.value)
+        }
+    </script>
+</body>
+
+</html>

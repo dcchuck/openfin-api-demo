@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+        <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css">
+        <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+        <style>
+            body {
+                text-align: center;
+            }
+        </style>
+        <title>TEMPLATE</title>
+    </head>
+    <body>
+        <h1>Hello From OpenFin</h1>
+        <div id='no-openfin'></div>
+        <button id='window-btn'>Open Window</button>
+        <br>
+        <button id='notification-btn'>Show Notification</button>
+        <div id='notification-clicked'></div>
+        <br>
+        <button id='monitor-info'>Get Monitor Info</button>
+        <div id='monitor-info-div'></div>
+        <br>
+        <button id='launch'>Launch App</button>
+        <input type='text' id='iab'></input>
+        <button id='interapp'>Send</button>
+        <div id='iab-rec'></div>
+        <script src='main.js'></script>
+        <script>
+            const windowButton = document.getElementById('window-btn');
+            windowButton.onclick = () => {
+                new fin.desktop.Window({
+                name: 'window2',
+                url: 'window.html',
+                autoShow: true});
+            }
+            const notificationButton = document.getElementById('notification-btn');
+            notificationButton.onclick = () => {
+                new fin.desktop.Notification({
+                    url: 'notification.html',
+                    onClick: () => {
+                        let notificationDiv = document.getElementById('notification-clicked');
+                        notificationDiv.innerText = 'Clicked!'
+                    },
+                    onClose: () => {
+                        let notificationDiv = document.getElementById('notification-clicked');
+                        notificationDiv.innerText = ''
+                    }
+                });
+            }
+            const monitorButton = document.getElementById('monitor-info');
+            monitorButton.onclick = () => {
+                let minfoDiv = document.getElementById('monitor-info-div');
+                    if (minfoDiv.innerText === '') {
+                        fin.desktop.System.getMonitorInfo(info => {
+                        minfoDiv.innerText = `You are using a ${info.primaryMonitor.availableRect.right} x ${info.primaryMonitor.availableRect.bottom} Monitor`
+                    })
+                } else {
+                    minfoDiv.innerText = ''
+                }
+            }
+            fin.desktop.InterApplicationBus.subscribe('app2', 'topic', (message) => {
+                let element = document.getElementById('iab-rec');
+                element.innerText = message;
+            })
+            let iabButton = document.getElementById('interapp')
+            let iabValue = document.getElementById('iab')
+            iabButton.onclick = () => {
+                fin.desktop.InterApplicationBus.send('app2', 'topic', iabValue.value)
+            }
+            let launchBtn = document.getElementById('launch')
+            launchBtn.onclick = () => {
+                let app2 = new fin.desktop.Application({
+                    name: 'app2',
+                    uuid: 'app2',
+                    url: 'http://localhost:3000/app2.html',
+                    mainWindowOptions: {
+                        autoShow: true
+                    }
+                }, () => { app2.run() }, (e) => { console.log(e) })
+            }
+        </script>
+    </body>
+</html>
